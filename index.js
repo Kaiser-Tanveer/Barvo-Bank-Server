@@ -24,10 +24,18 @@ function run() {
         const accountsCollection = client.db("BravoBank").collection("accounts");
         const accountTypesCollection = client.db("BravoBank").collection("accountTypes");
 
-        app.get('/accounts', async (req, res) => {
+
+        app.get('/accountsTypes', async (req, res) => {
             const query = {};
-            const result = await accountsCollection.find(query).toArray();
+            const result = await accountTypesCollection.find(query).toArray();
             res.send(result);
+        })
+
+        app.get('/accounts/:accountType', async (req, res) => {
+                const accountType = req.params.accountType;
+                const query = { accountType: accountType }
+                const result = await accountsCollection.findOne(query)
+                res.send(result);
         })
 
     } catch (error) {

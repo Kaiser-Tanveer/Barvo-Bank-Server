@@ -21,10 +21,12 @@ app.use(express.json());
 
 function run() {
     try {
+        // Collections 
         const accountsCollection = client.db("BravoBank").collection("accounts");
         const accountTypesCollection = client.db("BravoBank").collection("accountTypes");
 
 
+        // API 
         app.get('/accountsTypes', async (req, res) => {
             const query = {};
             const result = await accountTypesCollection.find(query).toArray();
@@ -32,10 +34,10 @@ function run() {
         })
 
         app.get('/accounts/:accountType', async (req, res) => {
-                const accountType = req.params.accountType;
-                const query = { accountType: accountType }
-                const result = await accountsCollection.findOne(query)
-                res.send(result);
+            const accountType = req.params.accountType;
+            const query = { accountType: accountType }
+            const result = await accountsCollection.findOne(query)
+            res.send(result);
         })
 
     } catch (error) {

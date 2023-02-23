@@ -19,12 +19,12 @@ app.use(express.json());
 
 function run() {
   try {
+    const accountTypesCollection = client.db("BravoBank").collection("accountTypes");
     const accountsCollection = client.db("BravoBank").collection("accounts");
-    const accountTypesCollection = client
-      .db("BravoBank")
-      .collection("accountTypes");
-    const cardsCollection = client.db("BravoBank").collection("cards");
     const cardTypesCollection = client.db("BravoBank").collection("cardTypes");
+    const cardsCollection = client.db("BravoBank").collection("cards");
+    const loanTypesCollection = client.db("BravoBank").collection("loanTypes");
+    const loansCollection = client.db("BravoBank").collection("loans");
 
     app.get("/accountsTypes", async (req, res) => {
       const query = {};
@@ -50,6 +50,20 @@ function run() {
       const result = await cardsCollection.findOne(query);
       res.send(result);
     });
+
+    app.get("/loansTypes", async (req, res) => {
+      const query = {};
+      const result = await loanTypesCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get("/loans/:loanType", async (req, res) => {
+      const loanType = req.params.loanType;
+      const query = { loanType: loanType };
+      const result = await loansCollection.findOne(query);
+      res.send(result);
+    });
+
   } catch (error) {
     console.log(error);
   }

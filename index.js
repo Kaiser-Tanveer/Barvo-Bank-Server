@@ -19,6 +19,7 @@ app.use(express.json());
 
 function run() {
   try {
+    // Collections 
     const accountTypesCollection = client.db("BravoBank").collection("accountTypes");
     const accountsCollection = client.db("BravoBank").collection("accounts");
     const cardTypesCollection = client.db("BravoBank").collection("cardTypes");
@@ -26,6 +27,7 @@ function run() {
     const loanTypesCollection = client.db("BravoBank").collection("loanTypes");
     const loansCollection = client.db("BravoBank").collection("loans");
 
+    // APIs 
     app.get("/accountsTypes", async (req, res) => {
       const query = {};
       const result = await accountTypesCollection.find(query).toArray();

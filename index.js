@@ -19,15 +19,18 @@ app.use(express.json());
 
 function run() {
   try {
-    // Collections 
-    const accountTypesCollection = client.db("BravoBank").collection("accountTypes");
+    // Collections
+    const accountTypesCollection = client
+      .db("BravoBank")
+      .collection("accountTypes");
     const accountsCollection = client.db("BravoBank").collection("accounts");
     const cardTypesCollection = client.db("BravoBank").collection("cardTypes");
     const cardsCollection = client.db("BravoBank").collection("cards");
     const loanTypesCollection = client.db("BravoBank").collection("loanTypes");
     const loansCollection = client.db("BravoBank").collection("loans");
+    const usersCollection = client.db("BravoBank").collection("users");
 
-    // APIs 
+    // APIs
     app.get("/accountsTypes", async (req, res) => {
       const query = {};
       const result = await accountTypesCollection.find(query).toArray();
@@ -65,7 +68,20 @@ function run() {
       const result = await loansCollection.findOne(query);
       res.send(result);
     });
+    // add Users
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
 
+    // get Users
+    app.get("/users", async (req, res) => {
+      const query = {};
+      const cursor = await usersCollection.find(query);
+      const users = await cursor.toArray();
+      res.send(users);
+    });
   } catch (error) {
     console.log(error);
   }

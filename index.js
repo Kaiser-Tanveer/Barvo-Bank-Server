@@ -29,7 +29,7 @@ function run() {
     const loanTypesCollection = client.db("BravoBank").collection("loanTypes");
     const loansCollection = client.db("BravoBank").collection("loans");
     const usersCollection = client.db("BravoBank").collection("users");
-    const requestedUsersCollection = client.db("BravoBank").collection("requestedUsers");
+    const usersAccCollection = client.db("BravoBank").collection("usersAcc");
 
     // APIs
     app.get("/accountsTypes", async (req, res) => {
@@ -73,6 +73,7 @@ function run() {
     app.post("/users", async (req, res) => {
       const user = req.body;
       const result = await usersCollection.insertOne(user);
+      console.log(result);
       res.send(result);
     });
 
@@ -87,23 +88,23 @@ function run() {
     // Data storing for the requested accounts 
     app.post("/requestedUsers", async (req, res) => {
       const reqUsers = req.body;
-      const result = await requestedUsersCollection.insertOne(reqUsers);
+      const result = await usersAccCollection.insertOne(reqUsers);
       res.send(result);
     });
 
     // Dashboard userRequest
     app.get("/requestedUsers", async (req, res) => {
       const reqUsers = req.body;
-      const result = await requestedUsersCollection.find(reqUsers).toArray();
+      const result = await usersAccCollection.find(reqUsers).toArray();
       res.send(result);
     });
 
     app.delete('/requestedUsersDelete/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
-      const result = await requestedUsersCollection.deleteOne(query);
+      const result = await usersAccCollection.deleteOne(query);
       res.send(result);
-  })
+    })
 
 
   } catch (error) {

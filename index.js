@@ -29,6 +29,7 @@ function run() {
     const loanTypesCollection = client.db("BravoBank").collection("loanTypes");
     const loansCollection = client.db("BravoBank").collection("loans");
     const usersCollection = client.db("BravoBank").collection("users");
+    const requestedUsersCollection = client.db("BravoBank").collection("requestedUsers");
 
     // APIs
     app.get("/accountsTypes", async (req, res) => {
@@ -82,6 +83,15 @@ function run() {
       const users = await cursor.toArray();
       res.send(users);
     });
+
+    // Data storing for the requested accounts 
+    app.post("/requestedUsers", async (req, res) => {
+      const reqUsers = req.body;
+      const result = await requestedUsersCollection.insertOne(reqUsers);
+      res.send(result);
+    });
+
+
   } catch (error) {
     console.log(error);
   }

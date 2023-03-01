@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.tl2ww1y.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -90,6 +90,20 @@ function run() {
       const result = await requestedUsersCollection.insertOne(reqUsers);
       res.send(result);
     });
+
+    // Dashboard userRequest
+    app.get("/requestedUsers", async (req, res) => {
+      const reqUsers = req.body;
+      const result = await requestedUsersCollection.find(reqUsers).toArray();
+      res.send(result);
+    });
+
+    app.delete('/requestedUsersDelete/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await requestedUsersCollection.deleteOne(query);
+      res.send(result);
+  })
 
 
   } catch (error) {

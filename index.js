@@ -78,11 +78,17 @@ function run() {
     });
 
     // get Users
-    app.get("/users", async (req, res) => {
+    app.get("/allUsers", async (req, res) => {
       const query = {};
-      const cursor = await usersCollection.find(query);
-      const users = await cursor.toArray();
+      const users = await usersCollection.find(query).toArray();
       res.send(users);
+    });
+
+    app.delete("/allUsers/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await usersCollection.deleteOne(query);
+      res.send(result);
     });
 
     // Data storing for the requested accounts
@@ -99,6 +105,26 @@ function run() {
       const result = await usersAccCollection.find(reqUsers).toArray();
       res.send(result);
     });
+
+    app.get("/singleAccDetails/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await usersAccCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.put('/userStatusUpdate/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const option = { upsert: true };
+      const updateDoc = {
+        $set: {
+          status: 'success'
+        }
+      }
+      const result = await usersAccCollection.updateOne(filter, updateDoc, option);
+      res.send(result)
+    })
 
     app.delete("/requestedUsersDelete/:id", async (req, res) => {
       const id = req.params.id;

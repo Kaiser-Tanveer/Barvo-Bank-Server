@@ -88,12 +88,13 @@ function run() {
     // Data storing for the requested accounts 
     app.post("/requestedUsers", async (req, res) => {
       const reqUsers = req.body;
+      console.log(reqUsers);
       const result = await usersAccCollection.insertOne(reqUsers);
       res.send(result);
     });
 
     // Dashboard userRequest
-    app.get("/requestedUsers", async (req, res) => {
+    app.get("/userAccounts", async (req, res) => {
       const reqUsers = req.body;
       const result = await usersAccCollection.find(reqUsers).toArray();
       res.send(result);

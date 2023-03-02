@@ -85,7 +85,7 @@ function run() {
       res.send(users);
     });
 
-    // Data storing for the requested accounts 
+    // Data storing for the requested accounts
     app.post("/requestedUsers", async (req, res) => {
       const reqUsers = req.body;
       console.log(reqUsers);
@@ -100,22 +100,27 @@ function run() {
       res.send(result);
     });
 
-    app.delete('/requestedUsersDelete/:id', async (req, res) => {
+    app.delete("/requestedUsersDelete/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id) }
+      const query = { _id: new ObjectId(id) };
       const result = await usersAccCollection.deleteOne(query);
       res.send(result);
-    })
+    });
 
     // user profile account
     app.get("/userAccount", async (req, res) => {
       const email = req.query.email;
-      const query = { email: email }
+      const query = { email: email };
       const result = await usersAccCollection.find(query).toArray();
-      res.send(result)
+      res.send(result);
     });
-
-
+    // single account details
+    app.get("/myAccounts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await usersAccCollection.find(query).toArray();
+      res.send(result);
+    });
   } catch (error) {
     console.log(error);
   }

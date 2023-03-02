@@ -100,6 +100,13 @@ function run() {
       res.send(result);
     });
 
+    app.get("/singleUserAccount/:singleReqDetailsId", async (req, res) => {
+      const id = req.params.singleReqDetailsId;
+      const query = { _id: new ObjectId(id) }
+      const result = await usersAccCollection.findOne(query);
+      res.send(result);
+    });
+
     app.delete('/requestedUsersDelete/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }

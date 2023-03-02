@@ -95,7 +95,7 @@ function run() {
 
     // Dashboard userRequest
     app.get("/userAccounts", async (req, res) => {
-      const reqUsers = req.body;
+      const reqUsers = {};
       const result = await usersAccCollection.find(reqUsers).toArray();
       res.send(result);
     });
@@ -106,6 +106,14 @@ function run() {
       const result = await usersAccCollection.deleteOne(query);
       res.send(result);
     })
+
+    // user profile account
+    app.get("/userAccount", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email }
+      const result = await usersAccCollection.find(query).toArray();
+      res.send(result)
+    });
 
 
   } catch (error) {

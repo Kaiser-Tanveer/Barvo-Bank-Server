@@ -30,6 +30,7 @@ function run() {
     const loansCollection = client.db("BravoBank").collection("loans");
     const usersCollection = client.db("BravoBank").collection("users");
     const usersAccCollection = client.db("BravoBank").collection("usersAcc");
+    const usersCardsCollection = client.db("BravoBank").collection("userCards");
 
     // APIs
     app.get("/accountsTypes", async (req, res) => {
@@ -102,8 +103,8 @@ function run() {
 
     // Dashboard userRequest
     app.get("/userAccounts", async (req, res) => {
-      const email = req.query.email;
-      const query = { email: email };
+      // const email = req.query.email;
+      const query = { };
       const result = await usersAccCollection.find(query).toArray();
       res.send(result);
     });
@@ -149,6 +150,110 @@ function run() {
       const result = await usersAccCollection.find(query).toArray();
       res.send(result);
     });
+
+    //Card Request
+    app.post('/cardsReq', async(req, res) =>{
+      const query = req.body;
+      const result = await usersCardsCollection.insertOne(query);
+
+      const id = req.body.accNum;
+      const filter = { _id: new ObjectId(id) }
+      const option = { upsert: true };
+      const updateDoc = {
+        $set: {
+          cards: 'pending'
+        }
+      }
+      const result2 = await usersAccCollection.updateOne(filter, updateDoc, option);
+      res.send(result);
+    })
+
+    // dashboard card request
+    app.get('/dashCardReq', async(req, res) =>{
+      const query = {}
+      const result = await usersCardsCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    // dashboard card Delete
+    app.delete('/dashCardDelete', async(req, res) =>{
+      const query = req.body;
+
+      const accNum = query.accNum;
+      const filter = { _id: new ObjectId(accNum) }
+      const option = { upsert: true };
+      const updateDoc = {
+        $set: {
+          cards: ''
+        }
+      }
+      const result2 = await usersAccCollection.updateOne(filter, updateDoc, option);
+
+      const id = query.id;
+      const match = { _id: new ObjectId(id) }
+      const result = await usersCardsCollection.deleteOne(match)
+      res.send(result);
+    })
+
+
+    // dashboard debit card Update
+    app.put('/dashCardDebit', async(req, res) =>{
+      const query = req.body;
+
+      const accNum = query.accNum;
+      const filter = { _id: new ObjectId(accNum) }
+      const option = { upsert: true };
+      const updateDoc = {
+        $set: {
+          cards: 'https://i.ibb.co/LJcpPtv/Dedit-Card.png',
+          cardStatus: 'success'
+        }
+      }
+      const result2 = await usersAccCollection.updateOne(filter, updateDoc, option);
+
+      const id = query.id;
+      const match = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updateDocs = {
+        $set: {
+          status: 'success'
+        }
+      }
+      const result = await usersCardsCollection.updateOne(match, updateDocs, options);
+
+      res.send(result);
+    })
+
+    // dashboard credit card Update
+    app.put('/dashCardCredit', async(req, res) =>{
+      const query = req.body;
+
+      const accNum = query.accNum;
+      const filter = { _id: new ObjectId(accNum) }
+      const option = { upsert: true };
+      const updateDoc = {
+        $set: {
+          cards: 'https://i.ibb.co/JpvNJWM/BaboCard.png',
+          cardStatus: 'success'
+        }
+      }
+      const result2 = await usersAccCollection.updateOne(filter, updateDoc, option);
+
+      const id = query.id;
+      const match = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updateDocs = {
+        $set: {
+          status: 'success'
+        }
+      }
+      const result = await usersCardsCollection.updateOne(match, updateDocs, options);
+
+      res.send(result);
+    })
+
+
+
   } catch (error) {
     console.log(error);
   }

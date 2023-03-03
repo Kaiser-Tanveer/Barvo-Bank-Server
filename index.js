@@ -99,10 +99,12 @@ function run() {
       res.send(result);
     });
 
+
     // Dashboard userRequest
     app.get("/userAccounts", async (req, res) => {
-      const reqUsers = {};
-      const result = await usersAccCollection.find(reqUsers).toArray();
+      const email = req.query.email;
+      const query = { email: email };
+      const result = await usersAccCollection.find(query).toArray();
       res.send(result);
     });
 

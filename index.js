@@ -31,6 +31,7 @@ function run() {
     const usersCollection = client.db("BravoBank").collection("users");
     const usersAccCollection = client.db("BravoBank").collection("usersAcc");
     const usersCardsCollection = client.db("BravoBank").collection("userCards");
+    const userLoansCollection = client.db("BravoBank").collection("userLoans");
 
     // APIs
     app.get("/accountsTypes", async (req, res) => {
@@ -104,7 +105,7 @@ function run() {
     // Dashboard userRequest
     app.get("/userAccounts", async (req, res) => {
       // const email = req.query.email;
-      const query = { };
+      const query = {};
       const result = await usersAccCollection.find(query).toArray();
       res.send(result);
     });
@@ -152,7 +153,7 @@ function run() {
     });
 
     //Card Request
-    app.post('/cardsReq', async(req, res) =>{
+    app.post('/cardsReq', async (req, res) => {
       const query = req.body;
       const result = await usersCardsCollection.insertOne(query);
 
@@ -169,14 +170,14 @@ function run() {
     })
 
     // dashboard card request
-    app.get('/dashCardReq', async(req, res) =>{
+    app.get('/dashCardReq', async (req, res) => {
       const query = {}
       const result = await usersCardsCollection.find(query).toArray();
       res.send(result);
     })
 
     // dashboard card Delete
-    app.delete('/dashCardDelete', async(req, res) =>{
+    app.delete('/dashCardDelete', async (req, res) => {
       const query = req.body;
 
       const accNum = query.accNum;
@@ -197,7 +198,7 @@ function run() {
 
 
     // dashboard debit card Update
-    app.put('/dashCardDebit', async(req, res) =>{
+    app.put('/dashCardDebit', async (req, res) => {
       const query = req.body;
 
       const accNum = query.accNum;
@@ -225,7 +226,7 @@ function run() {
     })
 
     // dashboard credit card Update
-    app.put('/dashCardCredit', async(req, res) =>{
+    app.put('/dashCardCredit', async (req, res) => {
       const query = req.body;
 
       const accNum = query.accNum;
@@ -249,6 +250,14 @@ function run() {
       }
       const result = await usersCardsCollection.updateOne(match, updateDocs, options);
 
+      res.send(result);
+    })
+
+    app.post('/loanReq', async (req, res) => {
+      const loanData = req.body;
+      console.log(loanData);
+      const result = await userLoansCollection.insertOne(loanData);
+      console.log(result);
       res.send(result);
     })
 

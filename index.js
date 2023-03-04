@@ -253,14 +253,89 @@ function run() {
       res.send(result);
     })
 
+    // User Loan
     app.post('/loanReq', async (req, res) => {
       const loanData = req.body;
-      console.log(loanData);
       const result = await userLoansCollection.insertOne(loanData);
-      console.log(result);
+
+      const id = req.body.accNum;
+      const filter = { _id: new ObjectId(id) }
+      const option = { upsert: true };
+      const updateDoc = {
+        $set: {
+          loanStatus: 'pending'
+        }
+      }
+      const result2 = await usersAccCollection.updateOne(filter, updateDoc, option);
+
       res.send(result);
     })
 
+    // dashboard Loan reqest
+    app.get('/userLoanReq', async(req, res) =>{
+      const query = {};
+      const result = await userLoansCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    app.get("/singleLoanDetails/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await userLoansCollection.findOne(query);
+      res.send(result);
+    });
+
+    // dashboard loan update
+    app.put('/userLoanUpdate', async(req, res) =>{
+
+      const id = req.body.id;
+      const filter = { _id: new ObjectId(id) }
+      const option = { upsert: true };
+      const updateDoc = {
+        $set: {
+          status: 'success'
+        }
+      }
+      const result = await userLoansCollection.updateOne(filter, updateDoc, option);
+
+      const accNum = req.body.accNum;
+      const filters = { _id: new ObjectId(accNum) }
+      const options = { upsert: true };
+      const updateDocs = {
+        $set: {
+          loanStatus: 'success'
+        }
+      }
+      const result2 = await usersAccCollection.updateOne(filters, updateDocs, options);
+
+      res.send(result);
+    })
+
+    app.delete("/userLoanDelete/:id", async (req, res) => {
+
+      const accNum = req.body.accNum;
+      const filters = { _id: new ObjectId(accNum) }
+      const options = { upsert: true };
+      const updateDocs = {
+        $set: {
+          loanStatus: ''
+        }
+      }
+      const result2 = await usersAccCollection.updateOne(filters, updateDocs, options);
+
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await userLoansCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // User Loan Show in there profile
+    app.get('/userLoans', async(req, res) =>{
+      const email = req.query.email;
+      const query = {email: email}
+      const result = await userLoansCollection.find(query).toArray();
+      res.send(result);
+    })
 
 
   } catch (error) {

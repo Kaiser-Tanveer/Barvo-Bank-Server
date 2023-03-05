@@ -32,6 +32,7 @@ function run() {
     const usersAccCollection = client.db("BravoBank").collection("usersAcc");
     const usersCardsCollection = client.db("BravoBank").collection("userCards");
     const userLoansCollection = client.db("BravoBank").collection("userLoans");
+    const userMoneyTransferCollection = client.db("BravoBank").collection("moneyTransfer");
 
     // APIs
     app.get("/accountsTypes", async (req, res) => {
@@ -335,6 +336,47 @@ function run() {
       const query = {email: email}
       const result = await userLoansCollection.find(query).toArray();
       res.send(result);
+    })
+
+    // User Money Transfer
+    app.put('/userMoneyTrans', async(req, res) =>{
+      const data = req.body;
+
+      const id = req.body.id;
+      const filters = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updateDocs = {
+        $set: {
+          amount: (data.userAmount - data.sendAmount)
+        }
+      }
+      const result2 = await usersAccCollection.updateOne(filters, updateDocs, options);
+
+      const previousAmount = Number(data.sendAmount)
+      const previousUserName = data.user;
+      const previousRole = data.transfer
+
+      const accNum = req.body.accNum;
+      const filter = { _id: new ObjectId(accNum) }
+      const result3 = await usersAccCollection.findOne(filter)
+      const newAmount = result3.amount
+      const newUserName = result3.user;
+      const newRole = result3.role;
+
+      if(previousUserName === newUserName && previousRole === newRole){
+        const option = { upsert: true };
+      const updateDoc = {
+        $set: {
+          amount: Number(newAmount + previousAmount)
+        }
+      }
+      const result = await usersAccCollection.updateOne(filter, updateDoc, option);
+      res.send(result);
+      }
+
+      else{
+        res.send('Please Provide Valid User Info')
+      }
     })
 
 

@@ -272,7 +272,7 @@ function run() {
     })
 
     // dashboard Loan reqest
-    app.get('/userLoanReq', async(req, res) =>{
+    app.get('/userLoanReq', async (req, res) => {
       const query = {};
       const result = await userLoansCollection.find(query).toArray();
       res.send(result);
@@ -286,7 +286,7 @@ function run() {
     });
 
     // dashboard loan update
-    app.put('/userLoanUpdate', async(req, res) =>{
+    app.put('/userLoanUpdate', async (req, res) => {
 
       const id = req.body.id;
       const filter = { _id: new ObjectId(id) }
@@ -330,9 +330,10 @@ function run() {
     });
 
     // User Loan Show in there profile
-    app.get('/userLoans', async(req, res) =>{
+    app.get('/userLoans', async (req, res) => {
       const email = req.query.email;
-      const query = {email: email}
+      const query = { email: email }
+      console.log(email);
       const result = await userLoansCollection.find(query).toArray();
       res.send(result);
     })

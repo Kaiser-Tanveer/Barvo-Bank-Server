@@ -273,7 +273,7 @@ function run() {
     })
 
     // dashboard Loan reqest
-    app.get('/userLoanReq', async(req, res) =>{
+    app.get('/userLoanReq', async (req, res) => {
       const query = {};
       const result = await userLoansCollection.find(query).toArray();
       res.send(result);
@@ -287,7 +287,7 @@ function run() {
     });
 
     // dashboard loan update
-    app.put('/userLoanUpdate', async(req, res) =>{
+    app.put('/userLoanUpdate', async (req, res) => {
 
       const id = req.body.id;
       const filter = { _id: new ObjectId(id) }
@@ -331,15 +331,15 @@ function run() {
     });
 
     // User Loan Show in there profile
-    app.get('/userLoans', async(req, res) =>{
+    app.get('/userLoans', async (req, res) => {
       const email = req.query.email;
-      const query = {email: email}
+      const query = { email: email }
       const result = await userLoansCollection.find(query).toArray();
       res.send(result);
     })
 
     // User Money Transfer
-    app.put('/userMoneyTrans', async(req, res) =>{
+    app.put('/userMoneyTrans', async (req, res) => {
       const data = req.body;
 
       const id = req.body.id;
@@ -363,19 +363,61 @@ function run() {
       const newUserName = result3.user;
       const newRole = result3.role;
 
-      if(previousUserName === newUserName && previousRole === newRole){
+      if (previousUserName === newUserName && previousRole === newRole) {
         const option = { upsert: true };
-      const updateDoc = {
-        $set: {
-          amount: Number(newAmount + previousAmount)
+        const updateDoc = {
+          $set: {
+            amount: Number(newAmount + previousAmount)
+          }
         }
-      }
-      const result = await usersAccCollection.updateOne(filter, updateDoc, option);
-      res.send(result);
+        const result = await usersAccCollection.updateOne(filter, updateDoc, option);
+        res.send(result);
       }
 
-      else{
+      else {
         res.send('Please Provide Valid User Info')
+      }
+    })
+
+    // User Profile Loan Show and update
+    app.get("/singleLoanDetails/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await userLoansCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.put('/lInfoUpdate', async (req, res) => {
+      const data = req.body;
+
+      const accNum = data.accNum;
+      const filter = { _id: new ObjectId(accNum) }
+      const result1 = await usersAccCollection.findOne(filter)
+      if (data.email === result1.email) {
+        const accountAmount = result1.amount;
+        
+        const option = { upsert: true };
+        const updateDoc = {
+          $set: {
+            amount: Number(accountAmount - data.amount)
+          }
+        }
+        const result2 = await usersAccCollection.updateOne(filter, updateDoc, option);
+
+        const filters = { _id: new ObjectId(data.id) }
+        const result3 = await userLoansCollection.findOne(filters)
+        const tLAmount = result3.tLAmount;
+        const options = { upsert: true };
+        const updateDocs = {
+          $set: {
+            tLAmount: Number(tLAmount - data.amount)
+          }
+        }
+        const result = await userLoansCollection.updateOne(filters, updateDocs, options);
+        res.send(result)
+      }
+      else {
+        res.send('Please Input Valid Information')
       }
     })
 

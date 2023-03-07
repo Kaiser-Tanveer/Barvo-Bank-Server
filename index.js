@@ -6,7 +6,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.tl2ww1y.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.tl2ww1y.mongodb.net/?retryWrites=true&w=majority` ;
 
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -32,7 +32,7 @@ function run() {
     const usersAccCollection = client.db("BravoBank").collection("usersAcc");
     const usersCardsCollection = client.db("BravoBank").collection("userCards");
     const userLoansCollection = client.db("BravoBank").collection("userLoans");
-    const userMoneyTransferCollection = client.db("BravoBank").collection("moneyTransfer");
+    const userDepositTransferCollection = client.db("BravoBank").collection("depositReq");
 
     // APIs
     app.get("/accountsTypes", async (req, res) => {
@@ -334,6 +334,7 @@ function run() {
     app.get('/userLoans', async (req, res) => {
       const email = req.query.email;
       const query = { email: email }
+      console.log(email);
       const result = await userLoansCollection.find(query).toArray();
       res.send(result);
     })
@@ -371,6 +372,7 @@ function run() {
           }
         }
         const result = await usersAccCollection.updateOne(filter, updateDoc, option);
+
         res.send(result);
       }
 
@@ -382,61 +384,54 @@ function run() {
     // deposit amount 
     app.put('/depositReq', async (req, res) => {
       const deposit = req.body;
-      const id = req.body.accNum;
-      const filter = { _id: new ObjectId(id) };
-      console.log(filter);
-      const option = {
-        upsert: true
-      };
-      const updatedDoc = {
+      const result = await userDepositTransferCollection.insertOne(deposit)
+
+      const filters = { _id: new ObjectId(deposit.accNum) }
+      const options = { upsert: true };
+      const updateDocs = {
         $set: {
-          depStatus: deposit.depStatus
+          depositReq: 'pending'
         }
       }
-      const result = await usersAccCollection.updateOne(filter, updatedDoc, option);
-      console.log(result);
-      res.send(result);
-    // User Profile Loan Show and update
-    app.get("/singleLoanDetails/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) }
-      const result = await userLoansCollection.findOne(query);
-      res.send(result);
-    });
+      const result2 = await usersAccCollection.updateOne(filters, updateDocs, options);
 
-    app.put('/lInfoUpdate', async (req, res) => {
-      const data = req.body;
-
-      const accNum = data.accNum;
-      const filter = { _id: new ObjectId(accNum) }
-      const result1 = await usersAccCollection.findOne(filter)
-      if (data.email === result1.email) {
-        const accountAmount = result1.amount;
-        
-        const option = { upsert: true };
-        const updateDoc = {
-          $set: {
-            amount: Number(accountAmount - data.amount)
-          }
-        }
-        const result2 = await usersAccCollection.updateOne(filter, updateDoc, option);
-
-        const filters = { _id: new ObjectId(data.id) }
-        const result3 = await userLoansCollection.findOne(filters)
-        const tLAmount = result3.tLAmount;
-        const options = { upsert: true };
-        const updateDocs = {
-          $set: {
-            tLAmount: Number(tLAmount - data.amount)
-          }
-        }
-        const result = await userLoansCollection.updateOne(filters, updateDocs, options);
-        res.send(result)
-      }
-      else {
-        res.send('Please Input Valid Information')
-      }
+      res.send(result)
     })
+
+    // dashboard deposit update
+
+    app.get('/dashDepoShow', async(req, res) =>{
+      const query = {};
+      const result = await userDepositTransferCollection.find(query).toArray();
+      res.send(result);
+    })
+
+//     app.put('/userDepositUpdate', async (req, res) => {
+
+//       const id = req.body.id;
+//       const filter = { _id: new ObjectId(id) }
+//       const option = { upsert: true };
+//       const updateDoc = {
+//         $set: {
+//           depStatus: 'success'
+//         }
+//       }
+//       // const result = await userDepositTransferCollection.updateOne(filter, updateDoc, option);
+
+//       const accNum = req.body.accNum;
+//       const result3 = await usersAccCollection.findOne(accNum);
+//       const filters = { _id: new ObjectId(accNum) }
+//       const options = { upsert: true };
+//       const updateDocs = {
+//         $set: {
+//           depositReq: 'success',
+//           amount: Number(amount + req.body.depositAmount)
+//         }
+//       }
+//       // const result2 = await usersAccCollection.updateOne(filters, updateDocs, options);
+// console.log(id, accNum);
+//       // res.send(result);
+//     })
 
 
   } catch (error) {

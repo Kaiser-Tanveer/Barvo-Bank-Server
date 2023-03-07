@@ -379,6 +379,23 @@ function run() {
       }
     })
 
+    // deposit amount 
+    app.put('/depositReq', async (req, res) => {
+      const deposit = req.body;
+      const id = req.body.accNum;
+      const filter = { _id: new ObjectId(id) };
+      console.log(filter);
+      const option = {
+        upsert: true
+      };
+      const updatedDoc = {
+        $set: {
+          depStatus: deposit.depStatus
+        }
+      }
+      const result = await usersAccCollection.updateOne(filter, updatedDoc, option);
+      console.log(result);
+      res.send(result);
     // User Profile Loan Show and update
     app.get("/singleLoanDetails/:id", async (req, res) => {
       const id = req.params.id;

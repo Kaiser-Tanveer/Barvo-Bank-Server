@@ -340,7 +340,7 @@ function run() {
     })
 
     // User Money Transfer
-    app.put('/userMoneyTrans', async(req, res) =>{
+    app.put('/userMoneyTrans', async (req, res) => {
       const data = req.body;
 
       const id = req.body.id;
@@ -364,20 +364,39 @@ function run() {
       const newUserName = result3.user;
       const newRole = result3.role;
 
-      if(previousUserName === newUserName && previousRole === newRole){
+      if (previousUserName === newUserName && previousRole === newRole) {
         const option = { upsert: true };
-      const updateDoc = {
-        $set: {
-          amount: Number(newAmount + previousAmount)
+        const updateDoc = {
+          $set: {
+            amount: Number(newAmount + previousAmount)
+          }
         }
-      }
-      const result = await usersAccCollection.updateOne(filter, updateDoc, option);
-      res.send(result);
+        const result = await usersAccCollection.updateOne(filter, updateDoc, option);
+        res.send(result);
       }
 
-      else{
+      else {
         res.send('Please Provide Valid User Info')
       }
+    })
+
+    // deposit amount 
+    app.put('/depositReq', async (req, res) => {
+      const deposit = req.body;
+      const id = req.body.accNum;
+      const filter = { _id: new ObjectId(id) };
+      console.log(filter);
+      const option = {
+        upsert: true
+      };
+      const updatedDoc = {
+        $set: {
+          depStatus: deposit.depStatus
+        }
+      }
+      const result = await usersAccCollection.updateOne(filter, updatedDoc, option);
+      console.log(result);
+      res.send(result);
     })
 
 

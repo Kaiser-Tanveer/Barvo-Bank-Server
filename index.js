@@ -406,32 +406,52 @@ function run() {
       res.send(result);
     })
 
-//     app.put('/userDepositUpdate', async (req, res) => {
+    app.put('/userDepositUpdate', async (req, res) => {
 
-//       const id = req.body.id;
-//       const filter = { _id: new ObjectId(id) }
-//       const option = { upsert: true };
-//       const updateDoc = {
-//         $set: {
-//           depStatus: 'success'
-//         }
-//       }
-//       // const result = await userDepositTransferCollection.updateOne(filter, updateDoc, option);
+      const id = req.body.id;
+      const filter = { _id: new ObjectId(id) }
+      const option = { upsert: true };
+      const updateDoc = {
+        $set: {
+          depStatus: 'success'
+        }
+      }
+      const result = await userDepositTransferCollection.updateOne(filter, updateDoc, option);
 
-//       const accNum = req.body.accNum;
-//       const result3 = await usersAccCollection.findOne(accNum);
-//       const filters = { _id: new ObjectId(accNum) }
-//       const options = { upsert: true };
-//       const updateDocs = {
-//         $set: {
-//           depositReq: 'success',
-//           amount: Number(amount + req.body.depositAmount)
-//         }
-//       }
-//       // const result2 = await usersAccCollection.updateOne(filters, updateDocs, options);
-// console.log(id, accNum);
-//       // res.send(result);
-//     })
+      const accNum = req.body.accNum;
+      const filters = { _id: new ObjectId(accNum) }
+      const result3 = await usersAccCollection.findOne(filters);
+      const newDepositAmount = Number(req.body.depositAmount)
+      const options = { upsert: true };
+      const updateDocs = {
+        $set: {
+          depositReq: 'success',
+          amount: Number(result3.amount + newDepositAmount)
+        }
+      }
+      const result2 = await usersAccCollection.updateOne(filters, updateDocs, options);
+      res.send(result);
+    })
+
+    app.delete('/userDepositDelete/:id', async (req, res) => {
+      const query = req.body;
+      const id = query.id;
+      const match = { _id: new ObjectId(id) }
+      const result = await userDepositTransferCollection.deleteOne(match)
+
+      const accNum = req.body.accNum;
+      const filters = { _id: new ObjectId(accNum) }
+      const result3 = await usersAccCollection.findOne(filters);
+      const options = { upsert: true };
+      const updateDocs = {
+        $set: {
+          depositReq: 'declined'
+        }
+      }
+      const result2 = await usersAccCollection.updateOne(filters, updateDocs, options);
+
+      res.send(result);
+    })
 
 
   } catch (error) {
